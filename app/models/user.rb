@@ -32,7 +32,7 @@ class User < ActiveRecord::Base
   ## Project relations
 
   # Project
-  has_many :projects, dependent: :destroy
+  has_many :projects, foreign_key: 'client_id', dependent: :destroy
 
   # proposals
   has_many :client_proposals, class_name: 'Project::Proposal', foreign_key: 'client_id', dependent: :destroy

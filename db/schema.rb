@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_04_18_140139) do
+ActiveRecord::Schema[7.0].define(version: 2023_04_19_154358) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -19,40 +19,50 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_18_140139) do
     t.date "start_date", default: -> { "CURRENT_TIMESTAMP" }
     t.date "end_date", default: -> { "CURRENT_TIMESTAMP" }
     t.string "status", limit: 20, default: "pending"
-    t.bigint "project_detail_id"
+    t.integer "agreed_amount", default: 0
+    t.bigint "project_id", null: false
+    t.bigint "client_id", null: false
+    t.bigint "freelancer_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["project_detail_id"], name: "index_contracts_on_project_detail_id"
+    t.index ["client_id"], name: "index_contracts_on_client_id"
+    t.index ["freelancer_id"], name: "index_contracts_on_freelancer_id"
+    t.index ["project_id"], name: "index_contracts_on_project_id"
   end
 
-  create_table "project_groups", force: :cascade do |t|
-    t.bigint "project_id"
-    t.bigint "client_id"
-    t.bigint "freelancer_id"
+  create_table "payment_details", force: :cascade do |t|
+    t.string "method", limit: 100
+    t.string "uid", default: "", null: false
+    t.integer "amount", default: 0
+    t.string "status", limit: 20, default: "pending"
+    t.date "date", default: -> { "CURRENT_TIMESTAMP" }
+    t.bigint "contract_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["client_id"], name: "index_project_groups_on_client_id"
-    t.index ["freelancer_id"], name: "index_project_groups_on_freelancer_id"
-    t.index ["project_id"], name: "index_project_groups_on_project_id"
+    t.index ["contract_id"], name: "index_payment_details_on_contract_id"
   end
 
   create_table "project_proposals", force: :cascade do |t|
     t.text "description"
     t.integer "bid_amount", default: 0
     t.string "status", limit: 20, default: "pending"
-    t.bigint "project_detail_id"
+    t.bigint "project_id", null: false
+    t.bigint "client_id", null: false
+    t.bigint "freelancer_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["project_detail_id"], name: "index_project_proposals_on_project_detail_id"
+    t.index ["client_id"], name: "index_project_proposals_on_client_id"
+    t.index ["freelancer_id"], name: "index_project_proposals_on_freelancer_id"
+    t.index ["project_id"], name: "index_project_proposals_on_project_id"
   end
 
-  create_table "project_skills", force: :cascade do |t|
+  create_table "project_tags", force: :cascade do |t|
     t.bigint "project_id"
     t.bigint "skill_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["project_id"], name: "index_project_skills_on_project_id"
-    t.index ["skill_id"], name: "index_project_skills_on_skill_id"
+    t.index ["project_id"], name: "index_project_tags_on_project_id"
+    t.index ["skill_id"], name: "index_project_tags_on_skill_id"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -62,7 +72,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_18_140139) do
     t.string "project_type", limit: 20
     t.integer "budget"
     t.integer "duration"
-    t.string "status", limit: 20
+    t.string "status", limit: 20, default: "pending"
     t.date "deadline"
     t.bigint "client_id"
     t.datetime "created_at", null: false
@@ -77,6 +87,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_18_140139) do
     t.bigint "reviewee_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "contract_id", null: false
+    t.index ["contract_id"], name: "index_reviews_on_contract_id"
     t.index ["reviewee_id"], name: "index_reviews_on_reviewee_id"
     t.index ["reviewer_id"], name: "index_reviews_on_reviewer_id"
   end
@@ -147,14 +159,17 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_18_140139) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
-  add_foreign_key "contracts", "project_groups", column: "project_detail_id"
-  add_foreign_key "project_groups", "projects"
-  add_foreign_key "project_groups", "users", column: "client_id"
-  add_foreign_key "project_groups", "users", column: "freelancer_id"
-  add_foreign_key "project_proposals", "project_groups", column: "project_detail_id"
-  add_foreign_key "project_skills", "projects"
-  add_foreign_key "project_skills", "skills"
+  add_foreign_key "contracts", "projects"
+  add_foreign_key "contracts", "users", column: "client_id"
+  add_foreign_key "contracts", "users", column: "freelancer_id"
+  add_foreign_key "payment_details", "contracts"
+  add_foreign_key "project_proposals", "projects"
+  add_foreign_key "project_proposals", "users", column: "client_id"
+  add_foreign_key "project_proposals", "users", column: "freelancer_id"
+  add_foreign_key "project_tags", "projects"
+  add_foreign_key "project_tags", "skills"
   add_foreign_key "projects", "users", column: "client_id"
+  add_foreign_key "reviews", "contracts"
   add_foreign_key "reviews", "users", column: "reviewee_id"
   add_foreign_key "reviews", "users", column: "reviewer_id"
   add_foreign_key "user_experience_tags", "skills", column: "experience_tag_id"

@@ -4,7 +4,7 @@ class Review < ApplicationRecord
   validates :text, presence: true, length: { maximum: 1000 }
 
   ### relations
-  belongs_to :reviewer, class_name: 'User', counter_cache: true
+  belongs_to :reviewer, class_name: 'User'
   belongs_to :reviewee, class_name: 'User'
-  belongs_to :contract, class_name: 'Contract', counter_cache: true
+  belongs_to :contract, class_name: 'Contract'
 end
