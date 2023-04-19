@@ -33,7 +33,7 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[7.0]
       t.string :nickname
       t.string :image
       t.string :email
-      t.account_type :string, limit: 20, default: 'user'
+      t.string :account_type, limit: 20, default: 'user'
 
       ## Tokens
       t.json :tokens
