@@ -41,5 +41,4 @@ class User < ActiveRecord::Base
   # contracts
   has_many :client_contracts, class_name: 'Contract', foreign_key: 'client_id', dependent: :destroy
   has_many :freelancer_contracts, class_name: 'Contract', foreign_key: 'freelancer_id', dependent: :destroy
-
 end

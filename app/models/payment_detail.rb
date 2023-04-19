@@ -1,5 +1,4 @@
 class PaymentDetail < ApplicationRecord
-
   belongs_to :contract, class_name: 'Contract', foreign_key: 'contract_id', dependent: :destroy
 
   validates :method, presence: true, inclusion: { in: %w[bank paypal] }
